@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 08 14:30:57 2016
+
+@author: Administrator
+"""
+import Minst
+import theano
+import pprint
+import cPickle as pickle
+import theano.tensor as T
+def predict():
+    """
+    An example of how to load a trained model and use it
+    to predict labels.
+    """
+
+    # load the saved model
+    x = T.matrix('x')
+    classifier = Minst.LogisticRegression(input=x, n_in=28 * 28, n_out=10)
+    classifier = pickle.load(open('best_model.pkl'))
+
+    # compile a predictor function
+    predict_model = theano.function(
+        inputs=[classifier.input],
+        outputs=classifier.y_pred)
+
+    # We can test it on some examples from test test
+    dataset='mnist.pkl.gz'
+    datasets = Minst.load_data(dataset)
+    test_set_x, test_set_y = datasets[2]
+    test_set_x = test_set_x.get_value()
+    pprint.pprint(test_set_y[0])
+    predicted_values = predict_model(test_set_x[:30])
+    print("Predicted values for the first 10 examples in test set:")
+    print(predicted_values),len(predicted_values)
+    
+if __name__ == '__main__':
+    predict()
